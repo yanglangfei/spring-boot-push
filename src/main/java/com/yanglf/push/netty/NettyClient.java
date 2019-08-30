@@ -5,6 +5,8 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.codec.string.StringEncoder;
 import org.springframework.stereotype.Component;
 
@@ -24,10 +26,16 @@ public class NettyClient {
                 .handler(new ChannelInitializer<Channel>() {
                     @Override
                     protected void initChannel(Channel ch) {
+                        ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(1024, 0, 2, 0, 2));
+                        ch.pipeline().addLast(new LengthFieldPrepender(2));
                         ch.pipeline().addLast(new StringEncoder());
                     }
                 });
-        return bootstrap.connect(host, port).channel();
+        Channel channel = bootstrap.connect(host, port).channel();
+        if (channel != null) {
+            channel.writeAndFlush("发起连接");
+        }
+        return channel;
     }
 
 

@@ -24,6 +24,8 @@ public class NettyController {
         try {
             Channel channel = nettyClient.init("127.0.0.1", 8888);
             channel.writeAndFlush(msg);
+            channel.flush();
+            channel.closeFuture();
             return "success";
         } catch (Exception e) {
             return "fail";
