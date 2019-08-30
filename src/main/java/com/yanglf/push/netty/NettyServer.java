@@ -72,7 +72,7 @@ public class NettyServer {
         // SO_KEEPALIVE  表示是否开启TCP底层心跳机制，true为开启
         // TCP_NODELAY 是否开始Nagle算法，true表示关闭，false表示开启，通俗地说，如果要求高实时性，有数据发送时就马上发送，就关闭，如果需要减少发送次数减少网络交互，就开启。
         serverBootstrap.childOption(ChannelOption.SO_KEEPALIVE, true)
-                .childOption(ChannelOption.TCP_NODELAY, false);
+                .childOption(ChannelOption.TCP_NODELAY, true);
         //给服务端channel设置一些属性 系统用于临时存放已完成三次握手的请求的队列的最大长度
         serverBootstrap.option(ChannelOption.SO_BACKLOG, 1024);
         serverBootstrap.bind(serverPort).addListener(new GenericFutureListener<Future<? super Void>>() {
