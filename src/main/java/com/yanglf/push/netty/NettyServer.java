@@ -33,7 +33,7 @@ public class NettyServer {
     @Value("${netty.worker.thread:50}")
     private int workerThread;
 
-    @Value("${netty.server.port}")
+    @Value("${netty.server.port:8888}")
     private int serverPort;
 
     @PostConstruct

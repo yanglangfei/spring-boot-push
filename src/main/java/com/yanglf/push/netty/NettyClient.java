@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class NettyClient {
 
-    public Channel init(String host, int port) {
+    public Channel init(String host, int port) throws InterruptedException {
         Bootstrap bootstrap = new Bootstrap();
         NioEventLoopGroup group = new NioEventLoopGroup();
         bootstrap.group(group)
@@ -46,10 +46,10 @@ public class NettyClient {
         });
         Channel channel = channelFuture.channel();
         if (channel != null) {
+            Thread.sleep(5000);
             channel.writeAndFlush("发起连接");
         }
         return channel;
     }
-
 
 }
