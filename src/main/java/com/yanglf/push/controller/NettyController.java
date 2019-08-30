@@ -16,12 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/netty")
 public class NettyController {
 
-    @Autowired
-    private NettyClient nettyClient;
 
     @RequestMapping("/send/{msg}")
     public String sendMsg(@PathVariable String msg) {
         try {
+            NettyClient nettyClient = new NettyClient();
             Channel channel = nettyClient.init("127.0.0.1", 8888);
             channel.writeAndFlush(msg);
             channel.flush();

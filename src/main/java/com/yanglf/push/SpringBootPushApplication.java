@@ -12,8 +12,6 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableAsync
 public class SpringBootPushApplication implements CommandLineRunner {
 
-    @Autowired
-    private NettyClient nettyClient;
 
     public static void main(String[] args) {
         SpringApplication.run(SpringBootPushApplication.class, args);
@@ -21,6 +19,7 @@ public class SpringBootPushApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        NettyClient nettyClient = new NettyClient();
         Channel channel = nettyClient.init("127.0.0.1", 8888);
         channel.writeAndFlush("hello netty");
 
