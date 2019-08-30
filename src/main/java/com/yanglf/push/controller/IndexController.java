@@ -13,8 +13,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class IndexController {
 
 
-    @RequestMapping("")
+    @RequestMapping("/sse")
     public String index() {
         return "index";
+    }
+
+
+    @RequestMapping("/socket")
+    public String socket() {
+        return "socket";
     }
 }

@@ -1,0 +1,12 @@
+# keytool -genkey -alias tomcathttps -keyalg RSA -keysize 2048  -keystore D:\javaboy.p12 -validity 365
+# genkey 表示要创建一个新的密钥。
+# alias 表示 keystore 的别名。
+# keyalg 表示使用的加密算法是 RSA ，一种非对称加密算法。
+# keysize 表示密钥的长度。
+# keystore 表示生成的密钥存放位置。
+# validity 表示密钥的有效时间，单位为天。
+server:
+  ssl:
+    key-store: classpath:javaboy.p12
+    key-alias: tomcathttps
+    key-password: admin123

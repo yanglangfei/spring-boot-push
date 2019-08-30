@@ -1,0 +1,57 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>WebSocket Test</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <script th:src="@{/js/jquery-3.4.1.min.js}" type="text/javascript"></script>
+</head>
+<body>
+<div>
+    <input type="button" id="btn_test" value="点击获取数据"/>
+</div>
+<div>
+    <div id="test_1">
+    </div>
+</div>
+</body>
+<script type="text/javascript">
+    //<![CDATA[
+    $(document).ready(function() {
+        var websocket =  null;
+        var sendData = {"id": 1, "userName": "tanjin", "phone": "1888221322122"};
+        // 模拟登陆
+        $.post("/socket/login", sendData, function(data) {
+            // 初始化一个WebSocket连接
+            websocket = new WebSocket("ws://localhost:8080/websocket");
+            websocket.onerror = function(event) {onError(event);};
+            websocket.onopen = function(event) {onOpen(event);};
+            // websocket接收的信息会通过这个回调方法返回给前端
+            websocket.onmessage = function(event) {onMessage(event);};
+        })
+
+        // 打印收到的websocket返回信息
+        function onMessage(event) {
+            $("#test_1").append("<label class='navbar-label'>" + event.data + "</label>").append("</br>");
+            $("#test_1").scrollTop( $("#test_1")[0].scrollHeight);
+        }
+
+        // 开启websocket请求回调处理
+        function onOpen(event) {
+            $("#test_1").empty();
+            var label = $("<label>").html("开始执行....");
+            $("#test_1").append(label).append("<br>").append("<br>");
+        }
+
+        //报错处理回调函数
+        function onError(event) {
+            alert(event.data);
+        }
+
+        //点击页面上的一个按钮，通过一个普通方法来开始一个websocket请求
+        $("#btn_test").click(function() {
+            $.post("/socket/send/message", null, function() {})
+        })
+    })
+    //]]>
+</script>
+</html>
