@@ -10,3 +10,8 @@ server:
     key-store: classpath:javaboy.p12
     key-alias: tomcathttps
     key-password: admin123
+
+
+netty:
+  server:
+    port: 8888
