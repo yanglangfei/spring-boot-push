@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>首页</title>
+</head>
+<body>
+<input type="text" id="userId" placeholder="请输入用户ID">
+<input type="button" id="btn" onclick="register()" value="连接">
+<script type="text/javascript">
+    var eventSource;
+    function register(){
+        var userId = document.getElementById('userId');
+        eventSource = new EventSource("http://localhost:8080/sse/event/" + userId.value);
+        eventSource.addEventListener("message", function (evt) {
+            var data = evt.data;
+            console.log(data);
+        })
+    }
+</script>
+
+</body>
+</html>
