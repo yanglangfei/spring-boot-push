@@ -51,7 +51,7 @@ public class NettyClient {
                 protected void initChannel(Channel ch) {
                     log.info("当前  channel:{}", ch.id().asShortText());
                     ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(1024, 0, 2, 0, 2));
-                    ch.pipeline().addLast("ping", new IdleStateHandler(0, 4, 0, TimeUnit.SECONDS));
+                    ch.pipeline().addLast("ping", new IdleStateHandler(0, 25, 0, TimeUnit.SECONDS));
                     ch.pipeline().addLast(new LengthFieldPrepender(2));
                     ch.pipeline().addLast("decoder", new StringDecoder());
                     ch.pipeline().addLast("encoder", new StringEncoder());
@@ -89,7 +89,7 @@ public class NettyClient {
                                     if (currentTime <= TRY_TIMES) {
                                         currentTime++;
                                         //在服务端设置的心跳时间内 发送心跳消息  验证服务器是否存活
-                                        ctx.channel().writeAndFlush("channel:[" + ch.id().asShortText() + "]心跳消息");
+                                        ctx.channel().writeAndFlush("HB:-----channel:[" + ch.id().asShortText() + "]");
                                     }
                                 }
                             }

@@ -69,17 +69,18 @@ public class NettyServer {
                     // LengthFieldPrepender是一个编码器，主要是在响应字节数据前面添加字节长度字段
                     ch.pipeline().addLast(new LengthFieldPrepender(2));
                     // 心跳
-                    ch.pipeline().addLast(new IdleStateHandler(5, 0, 0, TimeUnit.SECONDS));
+                    ch.pipeline().addLast(new IdleStateHandler(30, 0, 0, TimeUnit.SECONDS));
                     ch.pipeline().addLast("decoder", new StringDecoder());
                     ch.pipeline().addLast("encoder", new StringEncoder());
                     ch.pipeline().addLast(new SimpleChannelInboundHandler<String>() {
                         @Override
                         protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
-                            log.info("服务端接受到消息:[{}],channel:{}", msg, ctx.channel().id().asShortText());
-                            Attribute<NettyChannel> attr = ctx.attr(NETTY_CHANNEL_KEY);
-                            NettyChannel nettyChannel = attr.get();
-                            log.info("client channel:{}", nettyChannel);
-                            ctx.writeAndFlush(msg);
+                            if (msg.startsWith("HB:")) {
+                                log.info("HB---------" + ctx.channel().id().asShortText());
+                            } else {
+                                log.info("服务端接受到消息:[{}]====================channel:{}", msg, ctx.channel().id().asShortText());
+                                ctx.writeAndFlush(msg);
+                            }
                         }
 
                         @Override
@@ -93,7 +94,7 @@ public class NettyServer {
                             if (evt instanceof IdleStateEvent) {
                                 IdleStateEvent event = (IdleStateEvent) evt;
                                 if (event.state() == IdleState.READER_IDLE) {
-                                    log.info("5 秒没有接收到客户端的信息了,channel:{}", ctx.channel().id().asShortText());
+                                    log.info("30 秒没有接收到客户端的信息了,channel:{}", ctx.channel().id().asShortText());
                                     loss_read_time++;
                                     if (loss_read_time > 2) {
                                         ctx.channel().close();
@@ -108,7 +109,6 @@ public class NettyServer {
                         @Override
                         public void channelActive(ChannelHandlerContext ctx) throws Exception {
                             log.info("服务端 channel:{} 激活", ctx.channel().id().asShortText());
-
                             ctx.fireChannelActive();
                         }
 
