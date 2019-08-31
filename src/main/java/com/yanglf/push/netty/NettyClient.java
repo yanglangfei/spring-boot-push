@@ -131,7 +131,7 @@ public class NettyClient {
             });
             Channel channel = channelFuture.channel();
             if (channel != null) {
-                Thread.sleep(2000);
+                TimeUnit.MILLISECONDS.sleep(200);
                 channel.writeAndFlush("发起连接");
                 // channel.closeFuture().sync();
             }
