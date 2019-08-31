@@ -20,7 +20,7 @@ public class SpringBootPushApplication implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         NettyClient nettyClient = new NettyClient();
-        Channel channel = nettyClient.init("127.0.0.1", 8888);
+        Channel channel = nettyClient.connect("127.0.0.1", 8888, 0L);
         channel.writeAndFlush("hello netty");
 
     }

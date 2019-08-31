@@ -26,7 +26,7 @@ public class NettyController {
     public String connect(@PathVariable Long userId) {
         try {
             NettyClient nettyClient = new NettyClient();
-            Channel channel = nettyClient.init("127.0.0.1", 8888);
+            Channel channel = nettyClient.connect("127.0.0.1", 8888,userId);
             channelMap.put(userId, channel);
             return "success";
         } catch (Exception e) {
