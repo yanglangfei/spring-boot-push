@@ -1,5 +1,6 @@
 package com.yanglf.push.netty;
 
+import com.yanglf.push.model.NettyChannel;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -9,6 +10,7 @@ import io.netty.handler.codec.FixedLengthFrameDecoder;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.codec.string.StringDecoder;
+import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.handler.timeout.IdleStateHandler;
@@ -20,7 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -43,8 +44,9 @@ public class NettyServer {
 
     private int loss_read_time = 0;
 
-    @PostConstruct
-    public void init() {
+    public static final AttributeKey<NettyChannel> NETTY_CHANNEL_KEY = AttributeKey.valueOf("netty.channel");
+
+    public void run() {
         NioEventLoopGroup boos = new NioEventLoopGroup(bossThread);
         NioEventLoopGroup worker = new NioEventLoopGroup(workerThread);
         try {
@@ -68,11 +70,21 @@ public class NettyServer {
                     ch.pipeline().addLast(new LengthFieldPrepender(2));
                     // 心跳
                     ch.pipeline().addLast(new IdleStateHandler(5, 0, 0, TimeUnit.SECONDS));
-                    ch.pipeline().addLast(new StringDecoder());
+                    ch.pipeline().addLast("decoder", new StringDecoder());
+                    ch.pipeline().addLast("encoder", new StringEncoder());
                     ch.pipeline().addLast(new SimpleChannelInboundHandler<String>() {
                         @Override
                         protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
                             log.info("服务端接受到消息:[{}],channel:{}", msg, ctx.channel().id().asShortText());
+                            Attribute<NettyChannel> attr = ctx.attr(NETTY_CHANNEL_KEY);
+                            NettyChannel nettyChannel = attr.get();
+                            log.info("client channel:{}", nettyChannel);
+                            ctx.writeAndFlush(msg);
+                        }
+
+                        @Override
+                        public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+                            ctx.close();
                         }
 
                         @Override
@@ -96,6 +108,8 @@ public class NettyServer {
                         @Override
                         public void channelActive(ChannelHandlerContext ctx) throws Exception {
                             log.info("服务端 channel:{} 激活", ctx.channel().id().asShortText());
+
+                            ctx.fireChannelActive();
                         }
 
                         @Override
@@ -126,7 +140,7 @@ public class NettyServer {
                     .childOption(ChannelOption.TCP_NODELAY, true);
             //给服务端channel设置一些属性 系统用于临时存放已完成三次握手的请求的队列的最大长度
             serverBootstrap.option(ChannelOption.SO_BACKLOG, 1024);
-            ChannelFuture channelFuture = serverBootstrap.bind(serverPort);
+            ChannelFuture channelFuture = serverBootstrap.bind(serverPort).sync();
             channelFuture.addListener(new GenericFutureListener<Future<? super Void>>() {
                 @Override
                 public void operationComplete(Future<? super Void> future) throws Exception {
@@ -137,8 +151,10 @@ public class NettyServer {
                     }
                 }
             });
-          //  channelFuture.channel().closeFuture().sync();
+            channelFuture.channel().closeFuture().sync();
         } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
             boos.shutdownGracefully();
             worker.shutdownGracefully();
         }

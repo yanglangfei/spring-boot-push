@@ -27,11 +27,14 @@ public class NettyController {
         try {
             NettyClient nettyClient = new NettyClient();
             Channel channel = nettyClient.connect("127.0.0.1", 8888,userId);
-            channelMap.put(userId, channel);
+           if(channel!=null){
+               channelMap.put(userId, channel);
+           }
             return "success";
         } catch (Exception e) {
-            return "fail";
+          e.printStackTrace();
         }
+        return "fail";
     }
 
 
