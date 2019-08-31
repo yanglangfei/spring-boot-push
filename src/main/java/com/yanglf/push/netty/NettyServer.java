@@ -137,7 +137,7 @@ public class NettyServer {
                     }
                 }
             });
-            channelFuture.channel().closeFuture().sync();
+          //  channelFuture.channel().closeFuture().sync();
         } catch (Exception e) {
             boos.shutdownGracefully();
             worker.shutdownGracefully();
