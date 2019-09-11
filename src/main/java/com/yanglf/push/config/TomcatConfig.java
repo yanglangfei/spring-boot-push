@@ -1,21 +1,24 @@
+/*
 package com.yanglf.push.config;
 
-import org.apache.catalina.Context;
-import org.apache.catalina.connector.Connector;
-import org.apache.tomcat.util.descriptor.web.SecurityCollection;
-import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
+import io.undertow.servlet.api.SecurityConstraint;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.web.embedded.tomcat.TomcatConnectorCustomizer;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
+*/
 /**
  * tomcat 请求转发  同时支持  HTTP 和  HTTPS
  *
  * @author yanglf
  * @description
  * @since 2019/8/30
- **/
+ **//*
+
+
 @Configuration
+@ConditionalOnBean(TomcatConnectorCustomizer.class)
 public class TomcatConfig {
 
     @Bean
@@ -46,3 +49,4 @@ public class TomcatConfig {
         return connector;
     }
 }
+*/
